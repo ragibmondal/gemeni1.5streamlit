@@ -1,8 +1,22 @@
-models:
-  - Gemini 1
-  - Gemini 1.5
-  - PaLM 2
-model_mapping:
-  Gemini 1: gemini-1.0-pro-latest
-  Gemini 1.5: gemini-1.5-pro-latest
-  PaLM 2: palm-2-pro-latest
+# Google API configuration
+google_api:
+  api_key: GOOGLE_API
+
+# Database configuration
+database:
+  name: chat_history.db
+
+# Application settings
+app:
+  title: Google Generative AI Chatbot
+  models:
+    - name: Gemini 1
+      model_id: gemini-1.0-pro-latest
+    - name: Gemini 1.5
+      model_id: gemini-1.5-pro-latest
+
+# UI settings
+ui:
+  sidebar_width: 300
+  output_height: 500
+  expander_open: false
