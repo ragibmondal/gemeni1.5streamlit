@@ -17,24 +17,33 @@ else:
     st.error("Please set the 'GOOGLE_GENERATIVE_API_KEY' environment variable.")
     st.stop()
 
-# Sidebar for selecting the mode
-mode = st.sidebar.selectbox("Choose mode", ["Chat", "Image"])
+# Initialize chat history
+if "chat_history" not in st.session_state:
+    st.session_state["chat_history"] = []
 
-# Chat mode
-if mode == "Chat":
-    prompt = st.text_area("Enter your prompt")
-    if st.button("Generate"):
+# Display chat history
+for entry in st.session_state.chat_history:
+    if isinstance(entry, str):
+        st.text_area("User", value=entry, height=200, max_chars=None, key=f"user_input_{len(st.session_state.chat_history)}")
+    else:
+        st.image(entry[1], caption=entry[0], use_column_width=True)
+        st.text_area("AI Response", value=entry[2], height=200, max_chars=None, key=f"ai_response_{len(st.session_state.chat_history)}")
+
+# Get user input
+user_input = st.text_area("Enter your prompt or upload an image", height=200)
+uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
+
+# Process user input
+if st.button("Generate"):
+    if user_input:
+        st.session_state.chat_history.append(user_input)
         with st.spinner("Generating response..."):
-            response = model.generate_content(prompt)
-            st.success(response.text)
-
-# Image mode
-elif mode == "Image":
-    uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
-    if uploaded_file is not None:
+            response = model.generate_content(user_input)
+            st.session_state.chat_history.append(response.text)
+    elif uploaded_file is not None:
         img = Image.open(uploaded_file)
         prompt = st.text_area("Enter your prompt")
-        if st.button("Generate"):
-            with st.spinner("Generating response..."):
-                response = model.generate_content([prompt, img])
-                st.success(response.text)
+        st.session_state.chat_history.append(["Image Prompt", img, prompt])
+        with st.spinner("Generating response..."):
+            response = model.generate_content([prompt, img])
+            st.session_state.chat_history.append(response.text)
