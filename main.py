@@ -40,7 +40,7 @@ def main():
 
     if st.button("Send"):
         if model_selection == "Gemini 1":
-            model_name = "gemini-1.0-base-latest"
+            model_name = "gemini-1.0-pro-latest"
         else:
             model_name = "gemini-1.5-pro-latest"
 
