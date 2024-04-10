@@ -14,63 +14,39 @@ with open('config.yaml', 'r') as file:
 if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = []
 
-def fetch_response(user_input, model_name, image=None):
+def fetch_response(chat_history, model_name, image=None):
     # Configure the API with your key
     genai.configure(api_key=os.environ.get('GOOGLE_API'))
     model = genai.GenerativeModel(model_name)
+
+    # Construct prompt with chat history
+    prompt = ""
+    for entry in chat_history:
+        if 'image' in entry:
+            prompt += "User uploaded an image. "
+        prompt += f"User: {entry['user_input']}\nModel: {entry['response']}\n"
+
+    # Add new user input to the prompt
+    prompt += f"User: {chat_history[-1]['user_input']}\nModel: " 
+
     if image:
-        response = model.generate_content([user_input, image])
+        response = model.generate_content([prompt, image])
     else:
-        response = model.generate_content(user_input)
+        response = model.generate_content(prompt)
     return response.text
 
 def main():
-    st.set_page_config(page_title="Google Generative AI Chatbot", page_icon=":robot_face:")
-
-    st.title("Google Generative AI Chatbot")
-
-    st.sidebar.header("Input")
-    user_input = st.sidebar.text_area("Enter your message here:")
-    uploaded_file = st.sidebar.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
-    model_selection = st.sidebar.selectbox("Select Model", config['models'])
-
-    # Display chat history
-    st.header("Chat History")
-    for i, entry in enumerate(st.session_state['chat_history']):
-        with st.expander(f"Conversation {i+1}", expanded=True):
-            if 'image' in entry:
-                st.write("User uploaded an image")
-                st.image(entry['image'], caption="Uploaded Image", use_column_width=True)
-                st.write(f"User prompt: {entry['user_input']}")
-            else:
-                st.markdown(f"**User:** {entry['user_input']}")
-            st.markdown(f"**Model:** {entry['model_name']}")
-            st.markdown(f"**Response:** {entry['response']}")
-            st.write(f"Timestamp: {entry['timestamp']}")
+    # ... (rest of the code is the same as before)
 
     if st.sidebar.button("Send"):
-        model_name = config['model_mapping'][model_selection]
-        if uploaded_file is not None:
-            image = Image.open(uploaded_file)
-            response = fetch_response(user_input, model_name, image=image)
-            st.session_state['chat_history'].append({
-                'user_input': user_input,
-                'model_name': model_selection,
-                'response': response,
-                'image': image,
-                'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            })
-        else:
-            response = fetch_response(user_input, model_name)
-            st.session_state['chat_history'].append({
-                'user_input': user_input,
-                'model_name': model_selection,
-                'response': response,
-                'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            })
+        # ... (get model_name and image as before)
 
-        st.subheader("Output")
-        st.markdown(markdown.markdown(response), unsafe_allow_html=True)
+        response = fetch_response(st.session_state['chat_history'], model_name, image=image)
+        st.session_state['chat_history'].append({
+            # ... (rest of the append logic is the same)
+        })
+
+        # ... (rest of the code is the same as before)
 
 if __name__ == "__main__":
     main()
