@@ -1,11 +1,10 @@
 import streamlit as st
 import google.generativeai as genai
 import os
-from dotenv import load_dotenv
-load_dotenv()
 
 def fetch_response(user_input, model_name):
-    genai.configure(api_key=os.environ['GOOGLE_API'])
+    # Configure the API with your key
+    genai.configure(api_key=os.environ.get('GOOGLE_API'))
     model = genai.GenerativeModel(model_name)
 
     response = model.generate_content(user_input)
