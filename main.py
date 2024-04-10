@@ -82,9 +82,9 @@ def main():
     cols = st.columns([1, 3, 1])
 
     with cols[1]:
-        with st.container(class_="chat-container"):
+        with st.container("chat-container"):
             st.subheader("Chat History", class_="chat-header")
-            with st.container(class_="chat-history"):
+            with st.container("chat-history"):
                 for i, entry in enumerate(st.session_state['chat_history']):
                     with st.expander(f"Conversation {i+1}", expanded=True):
                         if 'image' in entry:
@@ -105,7 +105,7 @@ def main():
 
         response = ""  # Initialize response variable
 
-        with st.sidebar.container(class_="chat-input"):
+        with st.sidebar.container("chat-input"):
             if st.button("Send"):
                 model_name = config['model_mapping'][model_selection]
                 if uploaded_file is not None:
