@@ -4,6 +4,7 @@ import os
 from PIL import Image
 from datetime import datetime
 import yaml
+import markdown
 
 # Load configuration from YAML file
 with open('config.yaml', 'r') as file:
