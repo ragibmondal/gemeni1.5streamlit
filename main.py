@@ -56,6 +56,8 @@ def main():
         uploaded_file = st.sidebar.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
         model_selection = st.sidebar.selectbox("Select Model", config['models'])
 
+        response = ""  # Initialize response variable
+
         if st.sidebar.button("Send"):
             model_name = config['model_mapping'][model_selection]
             if uploaded_file is not None:
