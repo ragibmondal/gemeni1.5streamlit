@@ -1,0 +1,11 @@
+# Loading the chat history from the file
+if 'chat_history' not in st.session_state:
+    try:
+        with open('chat_history.pkl', 'rb') as file:
+            st.session_state['chat_history'] = pickle.load(file)
+    except (OSError, IOError):
+        st.session_state['chat_history'] = []
+
+# Saving the updated chat history to the file
+with open('chat_history.pkl', 'wb') as file:
+    pickle.dump(st.session_state['chat_history'], file)
