@@ -1,0 +1,8 @@
+models:
+  - Gemini 1
+  - Gemini 1.5
+  - PaLM 2
+model_mapping:
+  Gemini 1: gemini-1.0-pro-latest
+  Gemini 1.5: gemini-1.5-pro-latest
+  PaLM 2: palm-2-pro-latest
