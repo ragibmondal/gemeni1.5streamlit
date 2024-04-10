@@ -1,7 +1,0 @@
-if 'chat_history' not in st.session_state:
-    try:
-        with open('chat_history.pkl', 'rb') as file:
-            st.session_state['chat_history'] = pickle.load(file)
-    except (OSError, IOError, pickle.UnpicklingError) as e:
-        st.session_state['chat_history'] = []
-        print(f"Error loading chat history: {e}")
