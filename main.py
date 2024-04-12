@@ -20,9 +20,9 @@ def fetch_response(user_input, model_name, image=None, chat_history=None):
     model = genai.GenerativeModel(model_name)
 
     if image:
-        response = model.generate_content([user_input, image], chat_history=chat_history)
+        response = model.generate_content([{"text": user_input}, image], chat_history=chat_history)
     else:
-        response = model.generate_content(user_input, chat_history=chat_history)
+        response = model.generate_content({"text": user_input}, chat_history=chat_history)
 
     return response.text
 
@@ -75,26 +75,34 @@ def main():
 
     if st.button("Send"):
         model_name = config['model_mapping'][model_selection]
-        chat_history = [entry['user_input'] for entry in st.session_state['chat_history']]
+        chat_history = [{"text": entry['user_input']} for entry in st.session_state['chat_history']]
 
         if uploaded_file is not None:
             image = Image.open(uploaded_file)
-            response = fetch_response(user_input, model_name, image=image, chat_history=chat_history)
-            st.session_state['chat_history'].append({
-                'user_input': user_input,
-                'model_name': model_selection,
-                'response': response,
-                'image': image,
-                'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            })
+            try:
+                response = fetch_response(user_input, model_name, image=image, chat_history=chat_history)
+            except Exception as e:
+                st.error(f"An error occurred: {str(e)}")
+            else:
+                st.session_state['chat_history'].append({
+                    'user_input': user_input,
+                    'model_name': model_selection,
+                    'response': response,
+                    'image': image,
+                    'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                })
         else:
-            response = fetch_response(user_input, model_name, chat_history=chat_history)
-            st.session_state['chat_history'].append({
-                'user_input': user_input,
-                'model_name': model_selection,
-                'response': response,
-                'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            })
+            try:
+                response = fetch_response(user_input, model_name, chat_history=chat_history)
+            except Exception as e:
+                st.error(f"An error occurred: {str(e)}")
+            else:
+                st.session_state['chat_history'].append({
+                    'user_input': user_input,
+                    'model_name': model_selection,
+                    'response': response,
+                    'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                })
 
         st.subheader("Output")
         st.markdown(markdown.markdown(response), unsafe_allow_html=True)
