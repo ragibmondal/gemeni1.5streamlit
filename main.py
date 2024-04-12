@@ -14,15 +14,23 @@ with open('config.yaml', 'r') as file:
 if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = []
 
-def fetch_response(user_input, model_name, image=None, chat_history=None):
+def fetch_response(user_input, model_name, image=None, previous_context=None):
     # Configure the API with your key
     genai.configure(api_key=os.environ.get('GOOGLE_API'))
     model = genai.GenerativeModel(model_name)
 
     if image:
-        response = model.generate_content([{"text": user_input}, image], chat_history=chat_history)
+        if previous_context:
+            prompt = f"{previous_context} {user_input}"
+            response = model.generate_content([{"text": prompt}, image])
+        else:
+            response = model.generate_content([{"text": user_input}, image])
     else:
-        response = model.generate_content({"text": user_input}, chat_history=chat_history)
+        if previous_context:
+            prompt = f"{previous_context} {user_input}"
+            response = model.generate_content({"text": prompt})
+        else:
+            response = model.generate_content({"text": user_input})
 
     return response.text
 
@@ -75,12 +83,12 @@ def main():
 
     if st.button("Send"):
         model_name = config['model_mapping'][model_selection]
-        chat_history = [{"text": entry['user_input']} for entry in st.session_state['chat_history']]
+        previous_context = " ".join([entry['response'] for entry in st.session_state['chat_history']])
 
         if uploaded_file is not None:
             image = Image.open(uploaded_file)
             try:
-                response = fetch_response(user_input, model_name, image=image, chat_history=chat_history)
+                response = fetch_response(user_input, model_name, image=image, previous_context=previous_context)
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")
             else:
@@ -93,7 +101,7 @@ def main():
                 })
         else:
             try:
-                response = fetch_response(user_input, model_name, chat_history=chat_history)
+                response = fetch_response(user_input, model_name, previous_context=previous_context)
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")
             else:
