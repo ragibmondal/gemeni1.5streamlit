@@ -50,15 +50,19 @@ def main():
     st.header("Chat History")
     for i, entry in enumerate(st.session_state['chat_history']):
         with st.expander(f"Conversation {i+1}", expanded=True):
+            cols = st.columns([1, 3])
             if 'image' in entry:
-                st.write("User uploaded an image")
-                st.image(entry['image'], caption="Uploaded Image", use_column_width=True)
-                st.write(f"User prompt: {entry['user_input']}")
+                with cols[0]:
+                    st.image(entry['image'], caption="Uploaded Image", use_column_width=True)
+                with cols[1]:
+                    st.write(f"User prompt: {entry['user_input']}")
             else:
-                st.markdown(f"**User:** {entry['user_input']}")
-            st.markdown(f"**Model:** {entry['model_name']}")
-            st.markdown(f"**Response:** {entry['response']}")
-            st.write(f"Timestamp: {entry['timestamp']}")
+                with cols[1]:
+                    st.markdown(f"**User:** {entry['user_input']}")
+            with cols[1]:
+                st.markdown(f"**Model:** {entry['model_name']}")
+                st.markdown(f"**Response:** {entry['response']}")
+                st.write(f"Timestamp: {entry['timestamp']}")
 
     if st.button("Send"):
         model_name = config['model_mapping'][model_selection]
