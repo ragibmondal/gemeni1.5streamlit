@@ -52,6 +52,9 @@ def main():
                 background-color: #2d2d2d;
                 color: #ffffff;
             }
+            .stButton button {
+                color: #ffffff;
+            }
             </style>
         """, unsafe_allow_html=True)
     else:
@@ -59,6 +62,9 @@ def main():
             <style>
             .main {
                 background-color: #ffffff;
+                color: #000000;
+            }
+            .stButton button {
                 color: #000000;
             }
             </style>
