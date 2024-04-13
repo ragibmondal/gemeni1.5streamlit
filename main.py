@@ -43,18 +43,23 @@ def main():
         model_selection = st.selectbox("Select Model", config['models'])
         tone_selection = st.selectbox("Select Tone", ["Default", "Formal", "Casual", "Friendly", "Technical"])
 
-    # Main content area
     st.title("Google Generative AI Chatbot")
 
     # Chat container
     chat_container = st.container()
 
-    # User input
-    user_input = st.text_input("Message ChatGPT...", key="user_input", placeholder="Type your message here...", disabled=False)
-    uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"], key="uploaded_file")
+    # Sticky input container
+    input_container = st.container()
+    with input_container:
+        cols = st.columns([10, 1])
+        with cols[0]:
+            user_input = st.text_input("Message ChatGPT...", key="user_input", placeholder="Type your message here...", disabled=False)
+        with cols[1]:
+            uploaded_file = st.file_uploader("", type=["png", "jpg", "jpeg"], key="uploaded_file")
+        send_button = st.button("Send", key="send_button")
 
-    # Send button
-    if st.button("Send", key="send_button"):
+    # Send button logic
+    if send_button:
         model_name = config['model_mapping'][model_selection]
         previous_context = " ".join([entry['response'] for entry in st.session_state['chat_history']])
         tone = tone_selection.lower()
@@ -89,7 +94,7 @@ def main():
                 })
 
         # Clear user input after sending
-        user_input = ""
+        st.session_state['user_input'] = ""
 
     # Display chat history
     with chat_container:
@@ -101,11 +106,14 @@ def main():
                 with cols[1]:
                     st.markdown(f"**You:** {entry['user_input']}")
 
-                cols = st.columns([1, 10])
-                with cols[0]:
-                    st.image("https://cdn-icons-png.flaticon.com/512/3103/3103453.png", width=48)
-                with cols[1]:
-                    st.markdown(f"**ChatGPT:** {entry['response']}")
+            cols = st.columns([1, 10])
+            with cols[0]:
+                st.image("https://cdn-icons-png.flaticon.com/512/3103/3103453.png", width=48)
+            with cols[1]:
+                st.markdown(f"**ChatGPT:** {entry['response']}")
+
+            if 'image' in entry and entry['image'] is not None:
+                st.image(entry['image'], caption="Uploaded Image", use_column_width=True)
 
     # Disclaimer
     st.markdown("<small>ChatGPT can make mistakes. Consider checking important information. Read our Terms and Privacy Policy.</small>", unsafe_allow_html=True)
