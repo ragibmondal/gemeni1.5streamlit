@@ -50,7 +50,7 @@ def main():
     chat_container = st.container()
 
     # User input
-    user_input = st.text_input("Message ChatGPT...", key="user_input", placeholder="Type your message here...", disabled=False)
+    user_input = st.text_input("Message Gemini...", key="user_input", placeholder="Type your message here...", disabled=False)
     uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"], key="uploaded_file")
 
     # Send button
@@ -108,7 +108,7 @@ def main():
                     st.markdown(f"**ChatGPT:** {entry['response']}")
 
     # Disclaimer
-    st.markdown("<small>ChatGPT can make mistakes. Consider checking important information. Read our Terms and Privacy Policy.</small>", unsafe_allow_html=True)
+    st.markdown("<small>Gemini can make mistakes. Consider checking important information. Read our Terms and Privacy Policy.</small>", unsafe_allow_html=True)
 
     # Conversation management
     with st.sidebar:
