@@ -50,7 +50,7 @@ def main():
     chat_container = st.container()
 
     # User input
-    user_input = st.text_input("Enter your message here...", key="user_input")
+    user_input = st.text_input("Message ChatGPT...", key="user_input", placeholder="Type your message here...", disabled=False)
     uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"], key="uploaded_file")
 
     # Send button
@@ -95,26 +95,20 @@ def main():
     with chat_container:
         for i, entry in enumerate(st.session_state['chat_history']):
             with st.container():
-                user_message = st.container()
-                response_message = st.container()
+                cols = st.columns([1, 10])
+                with cols[0]:
+                    st.image("https://cdn-icons-png.flaticon.com/512/3135/3135786.png", width=48)
+                with cols[1]:
+                    st.markdown(f"**You:** {entry['user_input']}")
 
-                with user_message:
-                    st.markdown(f"**You:**")
-                    if 'image' in entry:
-                        cols = st.columns([1, 10])
-                        with cols[0]:
-                            st.image(entry['image'], caption="Uploaded Image", use_column_width=True)
-                        with cols[1]:
-                            st.write(entry['user_input'])
-                    else:
-                        st.write(entry['user_input'])
+                cols = st.columns([1, 10])
+                with cols[0]:
+                    st.image("https://cdn-icons-png.flaticon.com/512/3103/3103453.png", width=48)
+                with cols[1]:
+                    st.markdown(f"**ChatGPT:** {entry['response']}")
 
-                with response_message:
-                    st.markdown(f"**Model:** {entry['model_name']}")
-                    st.markdown(f"**Tone:** {entry['tone']}")
-                    st.markdown(f"**Response:**")
-                    st.write(entry['response'])
-                    st.write(f"Timestamp: {entry['timestamp']}")
+    # Disclaimer
+    st.markdown("<small>ChatGPT can make mistakes. Consider checking important information. Read our Terms and Privacy Policy.</small>", unsafe_allow_html=True)
 
     # Conversation management
     with st.sidebar:
