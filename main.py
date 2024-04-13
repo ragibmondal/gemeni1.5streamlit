@@ -46,6 +46,9 @@ def main():
     # Main content area
     st.title("Google Generative AI Chatbot")
 
+    # Chat container
+    chat_container = st.container()
+
     # User input and file upload (sticky)
     user_input = st.text_input("Message ChatGPT...", key="user_input", placeholder="Type your message here...", disabled=False)
     uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"], key="uploaded_file")
@@ -89,9 +92,6 @@ def main():
 
             # Clear user input after sending
             user_input = ""
-
-    # Chat container
-    chat_container = st.container()
 
     # Display chat history
     with chat_container:
