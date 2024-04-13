@@ -39,9 +39,7 @@ def main():
 
     # Sidebar components
     with st.sidebar:
-        st.header("Input")
-        user_input = st.text_area("Enter your message here:", height=200)
-        uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
+        st.header("Settings")
         model_selection = st.selectbox("Select Model", config['models'])
         tone_selection = st.selectbox("Select Tone", ["Default", "Formal", "Casual", "Friendly", "Technical"])
 
@@ -51,10 +49,12 @@ def main():
     # Chat container
     chat_container = st.container()
 
-    # Send button
-    send_button = st.button("Send")
+    # User input
+    user_input = st.text_input("Enter your message here...", key="user_input")
+    uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"], key="uploaded_file")
 
-    if send_button:
+    # Send button
+    if st.button("Send", key="send_button"):
         model_name = config['model_mapping'][model_selection]
         previous_context = " ".join([entry['response'] for entry in st.session_state['chat_history']])
         tone = tone_selection.lower()
@@ -94,25 +94,26 @@ def main():
     # Display chat history
     with chat_container:
         for i, entry in enumerate(st.session_state['chat_history']):
-            with st.expander(f"Conversation {i+1}", expanded=True):
+            with st.container():
                 user_message = st.container()
                 response_message = st.container()
 
                 with user_message:
-                    cols = st.columns([1, 10])
+                    st.markdown(f"**You:**")
                     if 'image' in entry:
+                        cols = st.columns([1, 10])
                         with cols[0]:
                             st.image(entry['image'], caption="Uploaded Image", use_column_width=True)
                         with cols[1]:
-                            st.markdown(f"**You:** {entry['user_input']}")
+                            st.write(entry['user_input'])
                     else:
-                        with cols[1]:
-                            st.markdown(f"**You:** {entry['user_input']}")
+                        st.write(entry['user_input'])
 
                 with response_message:
                     st.markdown(f"**Model:** {entry['model_name']}")
                     st.markdown(f"**Tone:** {entry['tone']}")
-                    st.markdown(f"**Response:** {entry['response']}")
+                    st.markdown(f"**Response:**")
+                    st.write(entry['response'])
                     st.write(f"Timestamp: {entry['timestamp']}")
 
     # Conversation management
