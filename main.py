@@ -49,47 +49,49 @@ def main():
     # Chat container
     chat_container = st.container()
 
-    # User input
-    user_input = st.text_input("Message Gemini...", key="user_input", placeholder="Type your message here...", disabled=False)
+    # User input and file upload (sticky)
+    user_input = st.text_input("Message ChatGPT...", key="user_input", placeholder="Type your message here...", disabled=False)
     uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"], key="uploaded_file")
 
-    # Send button
-    if st.button("Send", key="send_button"):
-        model_name = config['model_mapping'][model_selection]
-        previous_context = " ".join([entry['response'] for entry in st.session_state['chat_history']])
-        tone = tone_selection.lower()
+    # Send button container
+    send_button_container = st.container()
+    with send_button_container:
+        if st.button("Send", key="send_button"):
+            model_name = config['model_mapping'][model_selection]
+            previous_context = " ".join([entry['response'] for entry in st.session_state['chat_history']])
+            tone = tone_selection.lower()
 
-        if uploaded_file is not None:
-            image = Image.open(uploaded_file)
-            try:
-                response = fetch_response(user_input, model_name, image=image, previous_context=previous_context)
-            except Exception as e:
-                st.error(f"An error occurred: {str(e)}")
+            if uploaded_file is not None:
+                image = Image.open(uploaded_file)
+                try:
+                    response = fetch_response(user_input, model_name, image=image, previous_context=previous_context)
+                except Exception as e:
+                    st.error(f"An error occurred: {str(e)}")
+                else:
+                    st.session_state['chat_history'].append({
+                        'user_input': user_input,
+                        'model_name': model_selection,
+                        'tone': tone,
+                        'response': response,
+                        'image': image,
+                        'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    })
             else:
-                st.session_state['chat_history'].append({
-                    'user_input': user_input,
-                    'model_name': model_selection,
-                    'tone': tone,
-                    'response': response,
-                    'image': image,
-                    'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                })
-        else:
-            try:
-                response = fetch_response(user_input, model_name, previous_context=previous_context)
-            except Exception as e:
-                st.error(f"An error occurred: {str(e)}")
-            else:
-                st.session_state['chat_history'].append({
-                    'user_input': user_input,
-                    'model_name': model_selection,
-                    'tone': tone,
-                    'response': response,
-                    'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                })
+                try:
+                    response = fetch_response(user_input, model_name, previous_context=previous_context)
+                except Exception as e:
+                    st.error(f"An error occurred: {str(e)}")
+                else:
+                    st.session_state['chat_history'].append({
+                        'user_input': user_input,
+                        'model_name': model_selection,
+                        'tone': tone,
+                        'response': response,
+                        'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    })
 
-        # Clear user input after sending
-        user_input = ""
+            # Clear user input after sending
+            user_input = ""
 
     # Display chat history
     with chat_container:
@@ -108,7 +110,7 @@ def main():
                     st.markdown(f"**ChatGPT:** {entry['response']}")
 
     # Disclaimer
-    st.markdown("<small>Gemini can make mistakes. Consider checking important information. Read our Terms and Privacy Policy.</small>", unsafe_allow_html=True)
+    st.markdown("ChatGPT can make mistakes. Consider checking important information. Read our Terms and Privacy Policy.", unsafe_allow_html=True)
 
     # Conversation management
     with st.sidebar:
@@ -129,11 +131,7 @@ def main():
 
         if st.button("Download Chat History as PDF"):
             chat_history_html = "\n".join([
-                f"<p><strong>User:</strong> {entry['user_input']}</p>"
-                f"<p><strong>Model:</strong> {entry['model_name']}</p>"
-                f"<p><strong>Tone:</strong> {entry['tone']}</p>"
-                f"<p><strong>Response:</strong> {entry['response']}</p>"
-                f"<p><strong>Timestamp:</strong> {entry['timestamp']}</p><hr>"
+                f"\nUser: {entry['user_input']}\n\nModel: {entry['model_name']}\n\nTone: {entry['tone']}\n\nResponse: {entry['response']}\n\nTimestamp: {entry['timestamp']}\n"
                 for entry in st.session_state['chat_history']
             ])
             pdf_file = st.components.v1.html2pdf(chat_history_html, css=".pdf{font-family:Arial;}")
