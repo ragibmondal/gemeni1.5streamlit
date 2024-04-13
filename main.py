@@ -5,6 +5,8 @@ from PIL import Image
 from datetime import datetime
 import yaml
 import markdown
+import base64
+from io import BytesIO
 
 # Load configuration from YAML file
 with open('config.yaml', 'r') as file:
@@ -42,6 +44,7 @@ def main():
     user_input = st.sidebar.text_area("Enter your message here:", height=200)
     uploaded_file = st.sidebar.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
     model_selection = st.sidebar.selectbox("Select Model", config['models'])
+    tone_selection = st.sidebar.selectbox("Select Tone", ["Default", "Formal", "Casual", "Friendly", "Technical"])
 
     # Main content area
     st.title("Google Generative AI Chatbot")
@@ -61,12 +64,14 @@ def main():
                     st.markdown(f"**User:** {entry['user_input']}")
             with cols[1]:
                 st.markdown(f"**Model:** {entry['model_name']}")
+                st.markdown(f"**Tone:** {entry['tone']}")
                 st.markdown(f"**Response:** {entry['response']}")
                 st.write(f"Timestamp: {entry['timestamp']}")
 
     if st.button("Send"):
         model_name = config['model_mapping'][model_selection]
         previous_context = " ".join([entry['response'] for entry in st.session_state['chat_history']])
+        tone = tone_selection.lower()
 
         if uploaded_file is not None:
             image = Image.open(uploaded_file)
@@ -78,6 +83,7 @@ def main():
                 st.session_state['chat_history'].append({
                     'user_input': user_input,
                     'model_name': model_selection,
+                    'tone': tone,
                     'response': response,
                     'image': image,
                     'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -91,6 +97,7 @@ def main():
                 st.session_state['chat_history'].append({
                     'user_input': user_input,
                     'model_name': model_selection,
+                    'tone': tone,
                     'response': response,
                     'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 })
@@ -108,7 +115,7 @@ def main():
 
     if st.sidebar.button("Save Chat History"):
         chat_history_text = "\n".join([
-            f"User: {entry['user_input']}\nModel: {entry['model_name']}\nResponse: {entry['response']}\nTimestamp: {entry['timestamp']}\n\n"
+            f"User: {entry['user_input']}\nModel: {entry['model_name']}\nTone: {entry['tone']}\nResponse: {entry['response']}\nTimestamp: {entry['timestamp']}\n\n"
             for entry in st.session_state['chat_history']
         ])
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -116,6 +123,23 @@ def main():
         with open(filename, "w", encoding="utf-8") as file:
             file.write(chat_history_text)
         st.sidebar.success(f"Chat history saved as {filename}")
+
+    if st.sidebar.button("Download Chat History as PDF"):
+        chat_history_html = "\n".join([
+            f"<p><strong>User:</strong> {entry['user_input']}</p>"
+            f"<p><strong>Model:</strong> {entry['model_name']}</p>"
+            f"<p><strong>Tone:</strong> {entry['tone']}</p>"
+            f"<p><strong>Response:</strong> {entry['response']}</p>"
+            f"<p><strong>Timestamp:</strong> {entry['timestamp']}</p><hr>"
+            for entry in st.session_state['chat_history']
+        ])
+        pdf_file = st.components.v1.html2pdf(chat_history_html, css=".pdf{font-family:Arial;}")
+        st.download_button(
+            label="Download Chat History as PDF",
+            data=pdf_file,
+            file_name="chat_history.pdf",
+            mime="application/pdf",
+        )
 
 if __name__ == "__main__":
     main()
