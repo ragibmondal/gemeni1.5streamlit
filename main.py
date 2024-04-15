@@ -50,7 +50,7 @@ def main():
     chat_container = st.container()
 
     # User input and file upload (sticky)
-    user_input = st.text_input("Message ChatGPT...", key="user_input", placeholder="Type your message here...", disabled=False)
+    user_input = st.text_input("Message Gemini...", key="user_input", placeholder="Type your message here...", disabled=False)
     uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"], key="uploaded_file")
 
     # Send button container
@@ -107,7 +107,7 @@ def main():
                 with cols[0]:
                     st.image("https://cdn-icons-png.flaticon.com/512/3103/3103453.png", width=48)
                 with cols[1]:
-                    st.markdown(f"**ChatGPT:** {entry['response']}")
+                    st.markdown(f"**Gemini:** {entry['response']}")
 
     # Disclaimer
     st.markdown("ChatGPT can make mistakes. Consider checking important information. Read our Terms and Privacy Policy.", unsafe_allow_html=True)
