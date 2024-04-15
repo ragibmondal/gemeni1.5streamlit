@@ -122,7 +122,7 @@ def main():
         if st.button("Clear Chat History"):
             st.session_state['chat_history'] = []
 
-        if st.button("Save Chat History"):
+        if st.button("Save Chat History as Text"):
             chat_history_text = "\n".join([
                 f"User: {entry['user_input']}\nModel: {entry['model_name']}\nTone: {entry['tone']}\nResponse: {entry['response']}\nTimestamp: {entry['timestamp']}\n\n"
                 for entry in st.session_state['chat_history']
@@ -134,17 +134,20 @@ def main():
             st.success(f"Chat history saved as {filename}")
 
         if st.button("Download Chat History as PDF"):
-            chat_history_html = "\n".join([
-                f"\nUser: {entry['user_input']}\n\nModel: {entry['model_name']}\n\nTone: {entry['tone']}\n\nResponse: {entry['response']}\n\nTimestamp: {entry['timestamp']}\n"
-                for entry in st.session_state['chat_history']
-            ])
-            pdf_file = st.components.v1.html2pdf(chat_history_html, css=".pdf{font-family:Arial;}")
-            st.download_button(
-                label="Download Chat History as PDF",
-                data=pdf_file,
-                file_name="chat_history.pdf",
-                mime="application/pdf",
-            )
+            try:
+                chat_history_html = "\n".join([
+                    f"\n<p><strong>User:</strong> {entry['user_input']}</p>\n\n<p><strong>Model:</strong> {entry['model_name']}</p>\n\n<p><strong>Tone:</strong> {entry['tone']}</p>\n\n<p><strong>Response:</strong> {entry['response']}</p>\n\n<p><strong>Timestamp:</strong> {entry['timestamp']}</p>\n"
+                    for entry in st.session_state['chat_history']
+                ])
+                pdf_file = st.components.v1.html2pdf(chat_history_html, css=".pdf{font-family:Arial;}")
+                st.download_button(
+                    label="Download Chat History as PDF",
+                    data=pdf_file,
+                    file_name="chat_history.pdf",
+                    mime="application/pdf",
+                )
+            except Exception as e:
+                st.error(f"Error generating PDF: {str(e)}")
 
 if __name__ == "__main__":
     main()
