@@ -5,6 +5,7 @@ from PIL import Image
 from datetime import datetime
 import yaml
 import markdown
+import pdfkit
 
 # Load configuration from YAML file
 with open('config.yaml', 'r') as file:
@@ -139,7 +140,7 @@ def main():
                     f"\n<p><strong>User:</strong> {entry['user_input']}</p>\n\n<p><strong>Model:</strong> {entry['model_name']}</p>\n\n<p><strong>Tone:</strong> {entry['tone']}</p>\n\n<p><strong>Response:</strong> {entry['response']}</p>\n\n<p><strong>Timestamp:</strong> {entry['timestamp']}</p>\n"
                     for entry in st.session_state['chat_history']
                 ])
-                pdf_file = st.components.v1.html2pdf(chat_history_html, css=".pdf{font-family:Arial;}")
+                pdf_file = pdfkit.from_string(chat_history_html, False)
                 st.download_button(
                     label="Download Chat History as PDF",
                     data=pdf_file,
