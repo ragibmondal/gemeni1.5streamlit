@@ -5,7 +5,7 @@ from PIL import Image
 from datetime import datetime
 import yaml
 import markdown
-import pdfkit
+import weasyprint
 
 # Load configuration from YAML file
 with open('config.yaml', 'r') as file:
@@ -140,7 +140,7 @@ def main():
                     f"\n<p><strong>User:</strong> {entry['user_input']}</p>\n\n<p><strong>Model:</strong> {entry['model_name']}</p>\n\n<p><strong>Tone:</strong> {entry['tone']}</p>\n\n<p><strong>Response:</strong> {entry['response']}</p>\n\n<p><strong>Timestamp:</strong> {entry['timestamp']}</p>\n"
                     for entry in st.session_state['chat_history']
                 ])
-                pdf_file = pdfkit.from_string(chat_history_html, False)
+                pdf_file = weasyprint.HTML(string=chat_history_html).write_pdf()
                 st.download_button(
                     label="Download Chat History as PDF",
                     data=pdf_file,
