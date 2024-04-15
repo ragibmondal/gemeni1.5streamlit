@@ -35,23 +35,24 @@ def fetch_response(user_input, model_name, image=None, previous_context=None):
     return response.text
 
 def main():
-    st.set_page_config(page_title="Google Generative AI Chatbot", page_icon=":robot_face:", layout="wide")
+    st.set_page_config(page_title="Gemini AI Assistant", page_icon=":robot_face:", layout="wide")
 
     # Sidebar components
     with st.sidebar:
         st.header("Settings")
-        model_selection = st.selectbox("Select Model", config['models'])
-        tone_selection = st.selectbox("Select Tone", ["Default", "Formal", "Casual", "Friendly", "Technical"])
+        model_selection = st.selectbox("Select Model", config['models'], help="Choose the model you want to use.")
+        tone_selection = st.selectbox("Select Tone", ["Default", "Formal", "Casual", "Friendly", "Technical"], help="Choose the tone of the conversation.")
 
     # Main content area
-    st.title("Google Generative AI Chatbot")
+    st.title("Gemini AI Assistant")
+    st.write("Welcome to Gemini, your AI companion! You can chat with me, ask questions, or provide images for analysis.")
 
     # Chat container
     chat_container = st.container()
 
     # User input and file upload (sticky)
     user_input = st.text_input("Message Gemini...", key="user_input", placeholder="Type your message here...", disabled=False)
-    uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"], key="uploaded_file")
+    uploaded_file = st.file_uploader("Upload an image (optional)", type=["png", "jpg", "jpeg"], key="uploaded_file", help="You can upload an image for Gemini to analyze.")
 
     # Send button container
     send_button_container = st.container()
@@ -109,8 +110,11 @@ def main():
                 with cols[1]:
                     st.markdown(f"**Gemini:** {entry['response']}")
 
+                if 'image' in entry:
+                    st.image(entry['image'], caption="Uploaded Image", use_column_width=True)
+
     # Disclaimer
-    st.markdown("Gemini can make mistakes. Consider checking important information.", unsafe_allow_html=True)
+    st.markdown("**Disclaimer:** Gemini can make mistakes. Consider verifying important information from reliable sources.", unsafe_allow_html=True)
 
     # Conversation management
     with st.sidebar:
