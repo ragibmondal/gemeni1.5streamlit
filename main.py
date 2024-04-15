@@ -134,7 +134,7 @@ def main():
                 file.write(chat_history_text)
             st.success(f"Chat history saved as {filename}")
 
-   if st.button("Download Chat History as PDF"):
+if st.button("Download Chat History as PDF"):
     try:
         chat_history_html = "\n".join([
             f"\n<p><strong>User:</strong> {entry['user_input']}</p>\n\n<p><strong>Model:</strong> {entry['model_name']}</p>\n\n<p><strong>Tone:</strong> {entry['tone']}</p>\n\n<p><strong>Response:</strong> {entry['response']}</p>\n\n<p><strong>Timestamp:</strong> {entry['timestamp']}</p>\n"
