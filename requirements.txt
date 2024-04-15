@@ -3,5 +3,4 @@ google-generativeai>=0.2.1
 Pillow>=9.4.0
 PyYAML>=6.0
 Markdown>=3.4.1
-wkhtmltopdf
-pdfkit
+weasyprint
