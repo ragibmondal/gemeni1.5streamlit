@@ -110,7 +110,7 @@ def main():
                     st.markdown(f"**Gemini:** {entry['response']}")
 
     # Disclaimer
-    st.markdown("ChatGPT can make mistakes. Consider checking important information. Read our Terms and Privacy Policy.", unsafe_allow_html=True)
+    st.markdown("Gemini can make mistakes. Consider checking important information.", unsafe_allow_html=True)
 
     # Conversation management
     with st.sidebar:
