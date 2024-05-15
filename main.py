@@ -68,14 +68,23 @@ if prompt := st.chat_input("Enter your prompt here...", key="user_input"):
             image = Image.open(uploaded_file)
             previous_context = " ".join([entry['response'] for entry in st.session_state['messages']])
             prompt = f"{previous_context} {prompt}"
-            response = model.generate_content([{"text": prompt}, image])
+            response_output = model.generate_content([{"text": prompt}, image])
         else:
             previous_context = " ".join([entry['response'] for entry in st.session_state['messages']])
             prompt = f"{previous_context} {prompt}"
-            response = model.generate_content({"text": prompt})
+            response_output = model.generate_content({"text": prompt})
 
         with st.chat_message("assistant", avatar="🤖"):
-            st.markdown(response.text)
+            st.markdown(response_output.text)
+
+        # Append the full response to session_state.messages
+        st.session_state.messages.append({
+            "role": "assistant",
+            "content": response_output.text,
+            "model_name": model_option,
+            "tone": tone_selection.lower(),
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        })
 
     except Exception as e:
         st.error(f"Error: {e}", icon="🚨")
