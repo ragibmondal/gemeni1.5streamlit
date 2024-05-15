@@ -1,4 +1,3 @@
-]import streamlit as st
 import google.generativeai as genai
 import os
 from PIL import Image
@@ -19,8 +18,32 @@ with open('config.yaml', 'r') as file:
 if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = []
 
-def fetch_response(user_input, model_name, image=None, previous_context=None, tone="default"):
-    # ... (Your fetch_response function remains the same) ...
+def fetch_response(user_input, model_name, image=None, previous_context=None):
+    # Configure the API with your key
+    try:
+        genai.configure(api_key=os.environ.get('GOOGLE_API'))
+        model = genai.GenerativeModel(model_name)
+
+        if image:
+            if previous_context:
+                prompt = f"{previous_context} {user_input}"
+                logging.info(f"Prompt with previous context: {prompt}")
+                response = model.generate_content([{"text": prompt}, image])
+            else:
+                response = model.generate_content([{"text": user_input}, image])
+        else:
+            if previous_context:
+                prompt = f"{previous_context} {user_input}"
+                logging.info(f"Prompt with previous context: {prompt}")
+                response = model.generate_content({"text": prompt})
+            else:
+                response = model.generate_content({"text": user_input})
+
+        logging.info(f"API Response: {response.text}")
+        return response.text
+    except Exception as e:
+        logging.error(f"Error fetching response: {str(e)}")
+        return "An error occurred while processing your request. Please try again later."
 
 def main():
     st.set_page_config(page_title="Gemini AI Assistant", page_icon=":robot_face:", layout="wide")
@@ -29,11 +52,7 @@ def main():
     with st.sidebar:
         st.header("Settings")
         model_selection = st.selectbox("Select Model", config['models'], help="Choose the model you want to use.")
-        tone_selection = st.radio("Select Tone", ["Default", "Formal", "Casual", "Friendly", "Technical"], help="Choose the tone of the conversation.")
-
-        st.header("Input")  # Moved header inside sidebar
-        user_input = st.text_area("Message Gemini...", key="user_input", placeholder="Type your message here...", height=100)
-        uploaded_file = st.file_uploader("Upload an image (optional)", type=["png", "jpg", "jpeg"], key="uploaded_file", help="You can upload an image for Gemini to analyze.")
+        tone_selection = st.selectbox("Select Tone", ["Default", "Formal", "Casual", "Friendly", "Technical"], help="Choose the tone of the conversation.")
 
     # Main content area
     st.title("Gemini AI Assistant")
@@ -41,6 +60,10 @@ def main():
 
     # Chat container
     chat_container = st.container()
+
+    # User input and file upload (sticky)
+    user_input = st.text_input("Message Gemini...", key="user_input", placeholder="Type your message here...", disabled=False)
+    uploaded_file = st.file_uploader("Upload an image (optional)", type=["png", "jpg", "jpeg"], key="uploaded_file", help="You can upload an image for Gemini to analyze.")
 
     # Send button container
     send_button_container = st.container()
@@ -53,7 +76,7 @@ def main():
             if uploaded_file is not None:
                 image = Image.open(uploaded_file)
                 try:
-                    response = fetch_response(user_input, model_name, image=image, previous_context=previous_context, tone=tone)
+                    response = fetch_response(user_input, model_name, image=image, previous_context=previous_context)
                 except Exception as e:
                     st.error(f"An error occurred: {str(e)}")
                 else:
@@ -67,7 +90,7 @@ def main():
                     })
             else:
                 try:
-                    response = fetch_response(user_input, model_name, previous_context=previous_context, tone=tone)
+                    response = fetch_response(user_input, model_name, previous_context=previous_context)
                 except Exception as e:
                     st.error(f"An error occurred: {str(e)}")
                 else:
@@ -138,4 +161,4 @@ def main():
                 st.error(f"Error generating PDF: {str(e)}")
 
 if __name__ == "__main__":
-    main()
+    main()``` this is my strealit app rewrite and develop this app for more better user experience
