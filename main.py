@@ -6,9 +6,9 @@ from PIL import Image
 from datetime import datetime
 import yaml
 import pdfkit
+from dotenv import load_dotenv  # Import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+load_dotenv()  # Load environment variables from .env file
 
 # Load configuration from config.yaml
 with open("config.yaml", "r") as f:
