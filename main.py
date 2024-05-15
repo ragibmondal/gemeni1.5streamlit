@@ -89,6 +89,7 @@ if prompt := st.chat_input("Enter your prompt here...", key="user_input"):
     except Exception as e:
         st.error(f"Error: {e}", icon="🚨")
 
+
     # Append the full response to session_state.messages
     st.session_state.messages.append({
         "role": "assistant",
@@ -98,4 +99,33 @@ if prompt := st.chat_input("Enter your prompt here...", key="user_input"):
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     })
 
-# ... (the rest of your code)
+# Add a clear chat button
+if st.sidebar.button("Clear Chat"):
+    st.session_state.messages = []
+
+# Add a download chat history button
+if st.sidebar.button("Download Chat History"):
+    chat_history = "\n".join([f"{m['role'].capitalize()}: {m['content']}" for m in st.session_state.messages])
+    st.download_button(
+        label="Download Chat History",
+        data=chat_history,
+        file_name="chat_history.txt",
+        mime="text/plain",
+    )
+
+# Add a download chat history as PDF button
+if st.sidebar.button("Download Chat History as PDF"):
+    try:
+        chat_history_html = "\n".join([
+            f"\n<p><strong>{m['role'].capitalize()}:</strong> {m['content']}</p>\n\n<p><strong>Model:</strong> {m['model_name']}</p>\n\n<p><strong>Tone:</strong> {m['tone']}</p>\n\n<p><strong>Timestamp:</strong> {m['timestamp']}</p>\n"
+            for m in st.session_state.messages
+        ])
+        pdf_file = pdfkit.from_string(chat_history_html, False)
+        st.download_button(
+            label="Download Chat History as PDF",
+            data=pdf_file,
+            file_name="chat_history.pdf",
+            mime="application/pdf",
+        )
+    except Exception as e:
+        st.error(f"Error generating PDF: {str(e)}")
