@@ -1,6 +1,5 @@
-streamlit>=1.10.0
-google-generativeai>=0.1.0
-Pillow>=9.2.0
-python-dotenv>=0.20.0
-pyyaml>=6.0
-pdfkit>=1.0.0
+streamlit
+google-generativeai
+pillow
+pyyaml
+pdfkit
