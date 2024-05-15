@@ -1,8 +1,8 @@
 models:
   - Gemini 1
   - Gemini 1.5
-  - PaLM 2
+  - Gemini-1.5-Flash
 model_mapping:
   Gemini 1: gemini-1.0-pro-latest
   Gemini 1.5: gemini-1.5-pro-latest
-  PaLM 2: chat-bison-001
+  Gemini-1.5-Flash: gemini-1.5-flash-latest
