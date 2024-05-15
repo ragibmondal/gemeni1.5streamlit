@@ -6,9 +6,9 @@ from PIL import Image
 from datetime import datetime
 import yaml
 import pdfkit
-from dotenv import load_dotenv  # Import load_dotenv
+from dotenv import load_dotenv
 
-load_dotenv()  # Load environment variables from .env file
+load_dotenv()
 
 # Load configuration from config.yaml
 with open("config.yaml", "r") as f:
@@ -26,7 +26,7 @@ if not GOOGLE_API_KEY:
     st.error("GOOGLE_API_KEY environment variable not found. Please set it in the .env file.")
     st.stop()
 
-# Define model details
+# Sidebar components
 model_option = st.sidebar.selectbox("Select Model", config["models"].keys())
 model_info = {
     "model_id": config["model_mapping"][model_option],
@@ -44,6 +44,9 @@ st.sidebar.markdown(f"**Description:** {model_info['description']}")
 # Tone selection
 tone_selection = st.sidebar.selectbox("Select Tone", ["Default", "Formal", "Casual", "Friendly", "Technical"], help="Choose the tone of the conversation.")
 
+# Upload an image
+uploaded_file = st.sidebar.file_uploader("Upload an image (optional)", type=["png", "jpg", "jpeg"])
+
 # Display chat messages from history on app rerun
 for message in st.session_state.messages:
     avatar = '🤖' if message["role"] == "assistant" else '👨‍💻'
@@ -60,8 +63,6 @@ if prompt := st.chat_input("Enter your prompt here...", key="user_input"):
     try:
         genai.configure(api_key=GOOGLE_API_KEY)
         model = genai.GenerativeModel(model_info["model_id"])
-
-        uploaded_file = st.file_uploader("Upload an image (optional)", type=["png", "jpg", "jpeg"], key="uploaded_file", help="You can upload an image for analysis.")
 
         if uploaded_file is not None:
             image = Image.open(uploaded_file)
@@ -88,33 +89,4 @@ if prompt := st.chat_input("Enter your prompt here...", key="user_input"):
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     })
 
-# Add a clear chat button
-if st.sidebar.button("Clear Chat"):
-    st.session_state.messages = []
-
-# Add a download chat history button
-if st.sidebar.button("Download Chat History"):
-    chat_history = "\n".join([f"{m['role'].capitalize()}: {m['content']}" for m in st.session_state.messages])
-    st.download_button(
-        label="Download Chat History",
-        data=chat_history,
-        file_name="chat_history.txt",
-        mime="text/plain",
-    )
-
-# Add a download chat history as PDF button
-if st.sidebar.button("Download Chat History as PDF"):
-    try:
-        chat_history_html = "\n".join([
-            f"\n<p><strong>{m['role'].capitalize()}:</strong> {m['content']}</p>\n\n<p><strong>Model:</strong> {m['model_name']}</p>\n\n<p><strong>Tone:</strong> {m['tone']}</p>\n\n<p><strong>Timestamp:</strong> {m['timestamp']}</p>\n"
-            for m in st.session_state.messages
-        ])
-        pdf_file = pdfkit.from_string(chat_history_html, False)
-        st.download_button(
-            label="Download Chat History as PDF",
-            data=pdf_file,
-            file_name="chat_history.pdf",
-            mime="application/pdf",
-        )
-    except Exception as e:
-        st.error(f"Error generating PDF: {str(e)}")
+# ... (the rest of your code)
