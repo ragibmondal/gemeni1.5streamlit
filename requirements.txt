@@ -3,3 +3,4 @@ google-generativeai
 pillow
 pyyaml
 pdfkit
+markdown
