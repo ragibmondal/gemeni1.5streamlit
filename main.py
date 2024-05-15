@@ -80,7 +80,7 @@ if prompt := st.chat_input("Enter your prompt here...", key="user_input"):
         # Append the full response to session_state.messages
         st.session_state.messages.append({
             "role": "assistant",
-            "content": response_output.text,
+            "content": response_output.text,  # Use response_output here
             "model_name": model_option,
             "tone": tone_selection.lower(),
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -90,10 +90,10 @@ if prompt := st.chat_input("Enter your prompt here...", key="user_input"):
         st.error(f"Error: {e}", icon="🚨")
 
 
-    # Append the full response to session_state.messages
+    # Append the full response to session_state.messages (Use response_output here)
     st.session_state.messages.append({
         "role": "assistant",
-        "content": response.text,
+        "content": response_output.text,  # Use response_output here
         "model_name": model_option,
         "tone": tone_selection.lower(),
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -128,4 +128,4 @@ if st.sidebar.button("Download Chat History as PDF"):
             mime="application/pdf",
         )
     except Exception as e:
-        st.error(f"Error generating PDF: {str(e)}")
+        st.error(f"Error generating PDF: {str(e)}") 
