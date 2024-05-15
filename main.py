@@ -1,3 +1,4 @@
+import streamlit as st
 import google.generativeai as genai
 import os
 from PIL import Image
@@ -18,26 +19,34 @@ with open('config.yaml', 'r') as file:
 if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = []
 
-def fetch_response(user_input, model_name, image=None, previous_context=None):
+def fetch_response(user_input, model_name, image=None, previous_context=None, tone="default"):
     # Configure the API with your key
     try:
         genai.configure(api_key=os.environ.get('GOOGLE_API'))
         model = genai.GenerativeModel(model_name)
 
-        if image:
-            if previous_context:
-                prompt = f"{previous_context} {user_input}"
-                logging.info(f"Prompt with previous context: {prompt}")
-                response = model.generate_content([{"text": prompt}, image])
-            else:
-                response = model.generate_content([{"text": user_input}, image])
+        # Create prompt with tone adjustment (optional)
+        if tone == "formal":
+            prompt = f"Please provide a formal response to the following: {user_input}"
+        elif tone == "casual":
+            prompt = f"Respond casually to this: {user_input}"
+        elif tone == "friendly":
+            prompt = f"Be friendly and respond to this: {user_input}"
+        elif tone == "technical":
+            prompt = f"Provide a technical response to: {user_input}"
         else:
-            if previous_context:
-                prompt = f"{previous_context} {user_input}"
-                logging.info(f"Prompt with previous context: {prompt}")
-                response = model.generate_content({"text": prompt})
-            else:
-                response = model.generate_content({"text": user_input})
+            prompt = user_input
+
+        # Add previous context if available
+        if previous_context:
+            prompt = f"{previous_context} {prompt}"
+            logging.info(f"Prompt with previous context: {prompt}")
+
+        # Send request with image if provided
+        if image:
+            response = model.generate_content([{"text": prompt}, image])
+        else:
+            response = model.generate_content({"text": prompt})
 
         logging.info(f"API Response: {response.text}")
         return response.text
@@ -52,7 +61,7 @@ def main():
     with st.sidebar:
         st.header("Settings")
         model_selection = st.selectbox("Select Model", config['models'], help="Choose the model you want to use.")
-        tone_selection = st.selectbox("Select Tone", ["Default", "Formal", "Casual", "Friendly", "Technical"], help="Choose the tone of the conversation.")
+        tone_selection = st.radio("Select Tone", ["Default", "Formal", "Casual", "Friendly", "Technical"], help="Choose the tone of the conversation.")
 
     # Main content area
     st.title("Gemini AI Assistant")
@@ -62,7 +71,7 @@ def main():
     chat_container = st.container()
 
     # User input and file upload (sticky)
-    user_input = st.text_input("Message Gemini...", key="user_input", placeholder="Type your message here...", disabled=False)
+    user_input = st.text_area("Message Gemini...", key="user_input", placeholder="Type your message here...", height=100)
     uploaded_file = st.file_uploader("Upload an image (optional)", type=["png", "jpg", "jpeg"], key="uploaded_file", help="You can upload an image for Gemini to analyze.")
 
     # Send button container
@@ -76,7 +85,7 @@ def main():
             if uploaded_file is not None:
                 image = Image.open(uploaded_file)
                 try:
-                    response = fetch_response(user_input, model_name, image=image, previous_context=previous_context)
+                    response = fetch_response(user_input, model_name, image=image, previous_context=previous_context, tone=tone)
                 except Exception as e:
                     st.error(f"An error occurred: {str(e)}")
                 else:
@@ -90,7 +99,7 @@ def main():
                     })
             else:
                 try:
-                    response = fetch_response(user_input, model_name, previous_context=previous_context)
+                    response = fetch_response(user_input, model_name, previous_context=previous_context, tone=tone)
                 except Exception as e:
                     st.error(f"An error occurred: {str(e)}")
                 else:
