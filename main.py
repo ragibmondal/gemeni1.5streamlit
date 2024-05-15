@@ -28,7 +28,12 @@ if not GOOGLE_API_KEY:
 
 # Define model details
 model_option = st.sidebar.selectbox("Select Model", config["models"].keys())
-model_info = config["models"][model_option]
+model_info = {
+    "model_id": config["model_mapping"][model_option],
+    "name": model_option,
+    "developer": "Google",
+    "description": "A powerful language model by Google."
+}
 
 # Display model information
 st.sidebar.header("Model Information")
