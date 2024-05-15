@@ -80,7 +80,7 @@ if prompt := st.chat_input("Enter your prompt here...", key="user_input"):
         # Append the full response to session_state.messages
         st.session_state.messages.append({
             "role": "assistant",
-            "content": response_output.text,
+            "content": response_output.text,  # This line is correctly indented
             "model_name": model_option,
             "tone": tone_selection.lower(),
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
